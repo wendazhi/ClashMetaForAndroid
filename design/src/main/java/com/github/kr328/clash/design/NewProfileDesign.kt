@@ -44,7 +44,6 @@ class NewProfileDesign(context: Context) : Design<NewProfileDesign.Request>(cont
         } else {
             requests.trySend(Request.Create(provider))
         }
-
     }
 
     private fun requestDetail(provider: ProfileProvider): Boolean {
