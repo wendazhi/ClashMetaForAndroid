@@ -6,7 +6,7 @@
 
 - 应用名：Clash Verge TV
 - 包名：`io.github.clashvergerev.tv`
-- 版本：`0.1.7`（versionCode 107）
+- 版本：`0.1.8`（versionCode 108）
 - minSdk：21
 - targetSdk / compileSdk：35
 - Sony BRAVIA 8M2 国行实机：`armeabi-v7a`
@@ -16,8 +16,9 @@
 
 - 声明 `android.software.leanback`，提供 `LEANBACK_LAUNCHER` 入口，不要求触摸屏。
 - 主 Activity 固定横屏，使用电视专属 `layout-television` 双列布局。
-- 冷启动默认聚焦状态卡片；卡片获得焦点时有描边、缩放和高度反馈。
-- 方向键可进入配置、代理、日志、设置和帮助页面。
+- 冷启动默认聚焦状态卡片；焦点缩放限制在安全区内，并配合描边和高度反馈避免边界被裁切。
+- 顶部横向导航在代理、配置、日志、设置、帮助及其二级页面中保持固定，仅切换菜单下方内容。
+- 标签页打开后自动聚焦第一个可操作项，支持全程使用方向键和确认键。
 - 新建配置支持从 URL、文件或二维码导入；项目和安装包不包含任何预置订阅。
 - 使用 Android `VpnService` 和前台通知运行 Mihomo，配置格式与 Clash/Mihomo YAML 兼容。
 - Release 包使用独立应用 ID 和本地 release key 签名，可与其他 Clash 客户端并存。
