@@ -4,7 +4,7 @@
 
 ## 准备
 
-1. 国行 BRAVIA 8M2 使用 `clash-verge-tv-0.1.6-meta-armeabi-v7a-release.apk`。其他型号可先用 ADB 执行 `adb shell getprop ro.product.cpu.abilist`：包含 `arm64-v8a` 就选 64 位包，只包含 `armeabi-v7a` 就选 32 位包。
+1. 国行 BRAVIA 8M2 使用 `clash-verge-tv-0.1.7-meta-armeabi-v7a-release.apk`。其他型号可先用 ADB 执行 `adb shell getprop ro.product.cpu.abilist`：包含 `arm64-v8a` 就选 64 位包，只包含 `armeabi-v7a` 就选 32 位包。
 2. 安装前使用随包提供的 `SHA256SUMS.txt` 核对完整性。
 3. 准备一个 U 盘，推荐 FAT32 或 exFAT；将 APK 复制到 U 盘根目录。
 4. 电视连接网络，并切换到完整 Google TV 模式。Sony 说明“基本电视模式”不能安装新应用。
@@ -30,7 +30,7 @@
 
 ```bash
 adb connect 电视IP:5555
-adb install -r clash-verge-tv-0.1.6-meta-armeabi-v7a-release.apk
+adb install -r clash-verge-tv-0.1.7-meta-armeabi-v7a-release.apk
 ```
 
 5. 电视出现调试授权时选择“始终允许”并确认。若固件使用“无线调试”配对码，先按电视显示的地址执行 `adb pair IP:配对端口`，再执行电视显示的连接地址。
