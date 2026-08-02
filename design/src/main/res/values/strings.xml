@@ -1,8 +1,8 @@
 <resources xmlns:tools="http://schemas.android.com/tools" tools:ignore="PluralsCandidate">
-    <string name="launch_name_meta">Clash Verge Rev TV</string>
-    <string name="launch_name_alpha">Clash Verge Rev TV Alpha</string>
-    <string name="application_name_meta">Clash Verge Rev TV</string>
-    <string name="application_name_alpha">Clash Verge Rev TV Alpha</string>
+    <string name="launch_name_meta">Clash Verge TV</string>
+    <string name="launch_name_alpha">Clash Verge TV Alpha</string>
+    <string name="application_name_meta">Clash Verge TV</string>
+    <string name="application_name_alpha">Clash Verge TV Alpha</string>
     <string name="tv_remote_optimized">Android TV · Remote optimized</string>
 
     <string name="stopped">Stopped</string>
@@ -225,7 +225,7 @@
     <string name="import_from_clipboard">Import from Clipboard</string>
     <string name="export_to_clipboard">Export to Clipboard</string>
 
-    <string name="clash_meta_for_android">Clash Verge Rev TV</string>
+    <string name="clash_meta_for_android">Clash Verge TV</string>
 
     <string name="document">Document</string>
     <string name="feedback">Feedback</string>
@@ -240,7 +240,7 @@
     <string name="clash_meta_core_url" translatable="false">https://github.com/MetaCubeX/Clash.Meta</string>
 
     <string name="tips_properties"><![CDATA[Accept Only <strong>Clash Config</strong>(including <strong>Proxy</strong>/<strong>Rules</strong>)]]></string>
-    <string name="tips_help"><![CDATA[Clash Verge Rev TV is <strong>free and open-source software</strong>. It does <strong>not</strong> provide proxy subscriptions or network services.]]></string>
+    <string name="tips_help"><![CDATA[Clash Verge TV is <strong>free and open-source software</strong>. It does <strong>not</strong> provide proxy subscriptions or network services.]]></string>
 
     <string name="google_play_url" translatable="false">https://play.google.com/store/apps/details?id=com.github.kr328.clash</string>
 

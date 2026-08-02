@@ -63,8 +63,8 @@ subprojects {
             minSdk = 21
             targetSdk = 35
 
-            versionName = "0.1.4"
-            versionCode = 104
+            versionName = "0.1.5"
+            versionCode = 105
 
             resValue("string", "release_name", "v$versionName")
             resValue("integer", "release_code", "$versionCode")
@@ -84,7 +84,7 @@ subprojects {
             if (!isApp) {
                 consumerProguardFiles("consumer-rules.pro")
             } else {
-                setProperty("archivesBaseName", "clash-verge-rev-tv-$versionName")
+                setProperty("archivesBaseName", "clash-verge-tv-$versionName")
             }
         }
 

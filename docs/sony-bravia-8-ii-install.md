@@ -1,10 +1,10 @@
-# Sony BRAVIA 8 II（XR80M2 / 8M2）安装 Clash Verge Rev TV
+# Sony BRAVIA 8 II（XR80M2 / 8M2）安装 Clash Verge TV
 
 本教程对应 Sony BRAVIA 8 II（例如 K-55XR80M2、K-65XR80M2）。当前连接验证的国行 BRAVIA 8M2 运行 Android 14，并且系统只报告 ARMv7 32 位 ABI；不同地区和固件的架构可能不同。
 
 ## 准备
 
-1. 国行 BRAVIA 8M2 使用 `clash-verge-rev-tv-0.1.4-meta-armeabi-v7a-release.apk`。其他型号可先用 ADB 执行 `adb shell getprop ro.product.cpu.abilist`：包含 `arm64-v8a` 就选 64 位包，只包含 `armeabi-v7a` 就选 32 位包。
+1. 国行 BRAVIA 8M2 使用 `clash-verge-tv-0.1.5-meta-armeabi-v7a-release.apk`。其他型号可先用 ADB 执行 `adb shell getprop ro.product.cpu.abilist`：包含 `arm64-v8a` 就选 64 位包，只包含 `armeabi-v7a` 就选 32 位包。
 2. 安装前使用随包提供的 `SHA256SUMS.txt` 核对完整性。
 3. 准备一个 U 盘，推荐 FAT32 或 exFAT；将 APK 复制到 U 盘根目录。
 4. 电视连接网络，并切换到完整 Google TV 模式。Sony 说明“基本电视模式”不能安装新应用。
@@ -16,7 +16,7 @@
 3. 找到 APK 并按遥控器中间的确认键。
 4. 第一次侧载时系统会阻止安装。选择“设置”，在“安装未知应用”页面仅允许当前文件管理器。常见路径是“设置 → 应用 → 安全与限制 → 安装未知应用”；若界面不同，可在设置中搜索“未知应用”。
 5. 返回文件管理器，再次打开 APK，选择“安装”。
-6. 完成后选择“打开”，或回到首页“应用 → 查看全部应用 → Clash Verge Rev TV”。
+6. 完成后选择“打开”，或回到首页“应用 → 查看全部应用 → Clash Verge TV”。
 7. 安装成功后建议回到“安装未知应用”，关闭文件管理器的授权。
 
 ## 方法二：电脑通过 ADB 安装
@@ -30,7 +30,7 @@
 
 ```bash
 adb connect 电视IP:5555
-adb install -r clash-verge-rev-tv-0.1.4-meta-armeabi-v7a-release.apk
+adb install -r clash-verge-tv-0.1.5-meta-armeabi-v7a-release.apk
 ```
 
 5. 电视出现调试授权时选择“始终允许”并确认。若固件使用“无线调试”配对码，先按电视显示的地址执行 `adb pair IP:配对端口`，再执行电视显示的连接地址。
@@ -38,7 +38,7 @@ adb install -r clash-verge-rev-tv-0.1.4-meta-armeabi-v7a-release.apk
 
 ## 首次配置和启动
 
-1. 打开 Clash Verge Rev TV，首次焦点会落在最上方“已停止”卡片。
+1. 打开 Clash Verge TV，首次焦点会落在最上方“已停止”卡片。
 2. 方向键向下进入“配置”，按确认键。
 3. 选择右上角“+”新建配置，选择“URL”，输入自己的订阅地址并保存。项目和安装包不附带任何订阅。
 4. 回到配置列表，确认刚导入的配置左侧为蓝色选中状态，然后按返回键回到主页。

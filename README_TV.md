@@ -1,12 +1,12 @@
-# Clash Verge Rev TV
+# Clash Verge TV
 
 这是 Clash Verge Rev 的 Android TV 伴生版本，面向只使用遥控器的 Google TV / Android TV。桌面项目基于 Tauri，不能直接生成 Android APK，因此 TV 端复用 GPL-3.0 的 [ClashMetaForAndroid](https://github.com/MetaCubeX/ClashMetaForAndroid) 与 Mihomo 内核，并在本仓库中完成 TV 启动入口、十英尺主界面、D-pad 焦点反馈、独立包名与签名构建。
 
 ## 当前版本
 
-- 应用名：Clash Verge Rev TV
+- 应用名：Clash Verge TV
 - 包名：`io.github.clashvergerev.tv`
-- 版本：`0.1.4`（versionCode 104）
+- 版本：`0.1.5`（versionCode 105）
 - minSdk：21
 - targetSdk / compileSdk：35
 - Sony BRAVIA 8M2 国行实机：`armeabi-v7a`
