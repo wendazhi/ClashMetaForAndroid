@@ -1,6 +1,7 @@
 package com.github.kr328.clash.design
 
 import android.content.Context
+import android.content.res.Configuration
 import android.view.View
 import androidx.appcompat.app.AppCompatActivity
 import com.github.kr328.clash.design.ui.Surface
@@ -48,7 +49,9 @@ abstract class Design<R>(val context: Context) :
     init {
         when (context) {
             is AppCompatActivity -> {
-                context.window.decorView.setOnInsertsChangedListener {
+                val television = context.resources.configuration.uiMode and Configuration.UI_MODE_TYPE_MASK ==
+                    Configuration.UI_MODE_TYPE_TELEVISION
+                context.window.decorView.setOnInsertsChangedListener(adaptLandscape = !television) {
                     if (surface.insets != it) {
                         surface.insets = it
                     }

@@ -5,19 +5,21 @@ import android.content.Intent
 import android.content.res.Configuration
 import android.os.Build
 import android.os.Bundle
+import android.view.KeyEvent
 import android.view.View
+import android.view.ViewGroup
 import androidx.activity.result.contract.ActivityResultContract
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.content.ContextCompat
 import androidx.core.content.getSystemService
+import androidx.recyclerview.widget.RecyclerView
 import com.github.kr328.clash.common.compat.isAllowForceDarkCompat
 import com.github.kr328.clash.common.compat.isLightNavigationBarCompat
 import com.github.kr328.clash.common.compat.isLightStatusBarsCompat
 import com.github.kr328.clash.common.compat.isSystemBarsTranslucentCompat
 import com.github.kr328.clash.common.util.intent
 import com.github.kr328.clash.core.bridge.ClashException
-import com.github.kr328.clash.core.bridge.Bridge
 import com.github.kr328.clash.design.Design
-import com.github.kr328.clash.design.databinding.DesignAboutBinding
 import com.github.kr328.clash.design.model.DarkMode
 import com.github.kr328.clash.design.store.UiStore
 import com.github.kr328.clash.design.ui.DayNight
@@ -53,6 +55,7 @@ abstract class BaseActivity<D : Design<*>> : AppCompatActivity(),
             field = value
             if (value != null) {
                 setContentView(wrapTvContent(value.root))
+                window.decorView.post { focusPendingTvTab() }
             } else {
                 tvShell = null
                 setContentView(View(this))
@@ -112,18 +115,121 @@ abstract class BaseActivity<D : Design<*>> : AppCompatActivity(),
 
         return TvActivityShell(this).also { shell ->
             tvShell = shell
+            styleTvContent(content, isTopLevelTvTab())
             shell.setContent(content)
             shell.navigationBar.apply {
                 setActiveTab(activeTab)
                 proxyEnabled = clashRunning
                 onTabSelected = ::openTvTab
             }
+            shell.bindNavigationDown(activeTab)
 
-            if (isTopLevelTvTab()) {
-                content.findViewById<View>(R.id.activity_bar_close_view)?.visibility = View.GONE
+            shell.post {
+                if (!focusPendingTvTab()) shell.focusFirstContent()
             }
-            shell.focusFirstContent()
         }
+    }
+
+    private fun styleTvContent(content: View, topLevel: Boolean) {
+        content.setBackgroundColor(ContextCompat.getColor(this, R.color.tv_dashboard_background))
+        content.findViewById<View>(R.id.tab_layout_view)?.setBackgroundColor(
+            ContextCompat.getColor(this, R.color.tv_dashboard_background),
+        )
+
+        if (topLevel) {
+            content.findViewById<View>(R.id.activity_bar_layout)?.apply {
+                setBackgroundColor(ContextCompat.getColor(this@BaseActivity, R.color.tv_transparent))
+                elevation = 0f
+                translationZ = 0f
+            }
+            content.findViewById<View>(R.id.elevation_view)?.visibility = View.GONE
+            content.findViewById<View>(R.id.activity_bar_close_view)?.visibility = View.GONE
+            content.findViewById<View>(R.id.activity_bar_title_view)?.visibility = View.GONE
+
+            if (this is SettingsActivity || this is HelpActivity) {
+                content.findViewById<View>(R.id.activity_bar_layout)?.visibility = View.GONE
+            }
+        } else {
+            content.findViewById<View>(R.id.activity_bar_layout)?.apply {
+                alpha = 1f
+                setBackgroundColor(
+                    ContextCompat.getColor(this@BaseActivity, R.color.tv_dashboard_background),
+                )
+                bringToFront()
+                dockTvScrollableContentBelow(this, content)
+            }
+        }
+    }
+
+    private fun dockTvScrollableContentBelow(activityBar: View, content: View) {
+        val scroller = listOf(R.id.scroll_root, R.id.recycler_list)
+            .asSequence()
+            .mapNotNull { content.findViewById<View>(it) }
+            .firstOrNull { it.parent === activityBar.parent }
+            ?: return
+        val toolbarHeight = resources.getDimensionPixelSize(R.dimen.toolbar_height)
+        val layoutParams = scroller.layoutParams as? ViewGroup.MarginLayoutParams ?: return
+        layoutParams.topMargin = maxOf(layoutParams.topMargin, toolbarHeight)
+        scroller.layoutParams = layoutParams
+
+        val paddedContent = if (scroller.id == R.id.scroll_root && scroller is ViewGroup) {
+            scroller.getChildAt(0) ?: scroller
+        } else {
+            scroller
+        }
+        paddedContent.setPaddingRelative(
+            paddedContent.paddingStart,
+            (paddedContent.paddingTop - toolbarHeight).coerceAtLeast(0),
+            paddedContent.paddingEnd,
+            paddedContent.paddingBottom,
+        )
+    }
+
+    private fun focusPendingTvTab(): Boolean {
+        if (!isTelevision) return false
+        val current = currentTvTab() ?: return false
+        val navigation = tvShell?.navigationBar
+            ?: design?.root?.findViewById<TvNavigationBar>(R.id.tv_navigation_bar)
+            ?: return false
+        if (!TvNavigationBar.consumePendingFocus(current)) return false
+        navigation.focus(current)
+        return true
+    }
+
+    private fun redirectTvFocusUpToCurrentTab(): Boolean {
+        if (!isTelevision) return false
+        val currentTab = currentTvTab() ?: return false
+        val navigation = tvShell?.navigationBar
+            ?: design?.root?.findViewById<TvNavigationBar>(R.id.tv_navigation_bar)
+            ?: return false
+        val focused = currentFocus ?: return false
+        if (focused.isDescendantOf(navigation)) return false
+        val back = design?.root?.findViewById<View>(R.id.activity_bar_close_view)?.takeIf {
+            !isTopLevelTvTab() && it.visibility == View.VISIBLE && it.isFocusable
+        }
+        if (back != null && tvShell?.isFirstContentFocus(focused) == true) {
+            back.requestFocus()
+            return true
+        }
+        if (focused is RecyclerView && focused.canScrollVertically(-1)) return false
+        val next = focused.focusSearch(View.FOCUS_UP) ?: return false
+        if (!next.isDescendantOf(navigation)) return false
+
+        if (back != null && focused !== back) {
+            back.requestFocus()
+        } else {
+            navigation.focus(currentTab)
+        }
+        return true
+    }
+
+    private fun View.isDescendantOf(parent: ViewGroup): Boolean {
+        var current: View? = this
+        while (current != null) {
+            if (current === parent) return true
+            current = current.parent as? View
+        }
+        return false
     }
 
     private fun currentTvTab(): TvNavigationBar.Tab? = when (this) {
@@ -143,6 +249,7 @@ abstract class BaseActivity<D : Design<*>> : AppCompatActivity(),
         is MetaFeatureSettingsActivity,
         is AccessControlActivity -> TvNavigationBar.Tab.Settings
         is HelpActivity -> TvNavigationBar.Tab.Help
+        is AboutActivity -> TvNavigationBar.Tab.About
         else -> null
     }
 
@@ -152,6 +259,7 @@ abstract class BaseActivity<D : Design<*>> : AppCompatActivity(),
         is LogsActivity,
         is SettingsActivity,
         is HelpActivity -> true
+        is AboutActivity -> true
         else -> false
     }
 
@@ -168,26 +276,11 @@ abstract class BaseActivity<D : Design<*>> : AppCompatActivity(),
             TvNavigationBar.Tab.Proxy -> if (clashRunning) openTvTab(ProxyActivity::class.intent)
             TvNavigationBar.Tab.Profiles -> openTvTab(ProfilesActivity::class.intent)
             TvNavigationBar.Tab.Logs -> openTvTab(
-                if (LogcatService.running) LogcatActivity::class.intent else LogsActivity::class.intent,
+                LogsActivity::class.intent,
             )
             TvNavigationBar.Tab.Settings -> openTvTab(SettingsActivity::class.intent)
             TvNavigationBar.Tab.Help -> openTvTab(HelpActivity::class.intent)
-            TvNavigationBar.Tab.About -> launch { showTvAbout() }
-        }
-    }
-
-    private suspend fun showTvAbout() {
-        val versionName = withContext(Dispatchers.IO) {
-            packageManager.getPackageInfo(packageName, 0).versionName + "\n" +
-                Bridge.nativeCoreVersion().replace("_", "-")
-        }
-        withContext(Dispatchers.Main) {
-            val about = DesignAboutBinding.inflate(layoutInflater).apply {
-                this.versionName = versionName
-            }
-            androidx.appcompat.app.AlertDialog.Builder(this@BaseActivity)
-                .setView(about.root)
-                .show()
+            TvNavigationBar.Tab.About -> openTvTab(AboutActivity::class.intent)
         }
     }
 
@@ -203,6 +296,22 @@ abstract class BaseActivity<D : Design<*>> : AppCompatActivity(),
         launch {
             main()
         }
+    }
+
+    override fun onResume() {
+        super.onResume()
+        window.decorView.post { focusPendingTvTab() }
+    }
+
+    override fun dispatchKeyEvent(event: KeyEvent): Boolean {
+        if (
+            event.action == KeyEvent.ACTION_DOWN &&
+            event.keyCode == KeyEvent.KEYCODE_DPAD_UP &&
+            redirectTvFocusUpToCurrentTab()
+        ) {
+            return true
+        }
+        return super.dispatchKeyEvent(event)
     }
 
     override fun onStart() {

@@ -1,5 +1,6 @@
 package com.github.kr328.clash.design.adapter
 
+import android.content.res.Configuration
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.github.kr328.clash.core.model.Proxy
@@ -60,8 +61,12 @@ class ProxyPageAdapter(
 
         val toolbarHeight = config.context.getPixels(R.dimen.toolbar_height)
         val tabHeight = config.context.getPixels(R.dimen.tab_layout_height)
+        val tvToolbarHeight = config.context.getPixels(R.dimen.tv_proxy_toolbar_height)
+        val television = config.context.resources.configuration.uiMode and Configuration.UI_MODE_TYPE_MASK ==
+            Configuration.UI_MODE_TYPE_TELEVISION
 
-        holder.recyclerView.bindInsets(surface, toolbarHeight + tabHeight)
+        holder.recyclerView.bindInsets(surface, if (television) tvToolbarHeight else toolbarHeight + tabHeight)
+        if (television) holder.recyclerView.clipToPadding = true
         holder.recyclerView.addScrolledToBottomObserver { view, bottom ->
             val position = view.position
             val state = states[position]

@@ -18,6 +18,7 @@
 
     <!--  Tab Layout  -->
     <dimen name="tab_layout_height">48dp</dimen>
+    <dimen name="tv_proxy_toolbar_height">52dp</dimen>
     <dimen name="tab_layout_elevation">5dp</dimen>
 
     <!--  Bottom Sheet  -->
@@ -50,6 +51,7 @@
     <dimen name="large_action_card_min_height">85dp</dimen>
     <dimen name="tv_focus_stroke">0dp</dimen>
     <dimen name="tv_focus_elevation">0dp</dimen>
+    <dimen name="tv_focus_safe_margin">6dp</dimen>
     <dimen name="tv_item_gap">0dp</dimen>
     <dimen name="tv_dashboard_radius">8dp</dimen>
     <dimen name="tv_dashboard_stroke">0dp</dimen>
@@ -78,6 +80,7 @@
     <dimen name="proxy_text_size_grid3">11sp</dimen>
     <dimen name="proxy_card_radius">5dp</dimen>
     <dimen name="proxy_card_offset">0dp</dimen>
+    <dimen name="proxy_screen_horizontal_padding">0dp</dimen>
 
     <!-- Properties Design -->
     <dimen name="properties_element_margin_vertical">2.5dp</dimen>

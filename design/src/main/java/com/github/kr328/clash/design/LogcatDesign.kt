@@ -66,5 +66,6 @@ class LogcatDesign(
             }
         }
         binding.recyclerList.adapter = adapter
+        binding.recyclerList.enableTvDocumentScrolling()
     }
 }

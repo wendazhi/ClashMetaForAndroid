@@ -10,8 +10,8 @@
     <androidx.coordinatorlayout.widget.CoordinatorLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:paddingStart="@{self.surface.insets.start}"
-        android:paddingEnd="@{self.surface.insets.end}">
+        android:paddingStart="@{(float) self.surface.insets.start + @dimen/proxy_screen_horizontal_padding}"
+        android:paddingEnd="@{(float) self.surface.insets.end + @dimen/proxy_screen_horizontal_padding}">
 
         <TextView
             android:id="@+id/empty_view"
@@ -104,6 +104,7 @@
                 android:alpha="0.96"
                 android:background="?android:windowBackground"
                 app:tabBackground="@android:color/transparent"
+                app:tabContentStart="0dp"
                 app:tabMode="scrollable" />
 
             <View

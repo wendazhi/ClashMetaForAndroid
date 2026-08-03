@@ -2,6 +2,8 @@ package com.github.kr328.clash.design.view
 
 import android.content.Context
 import android.util.AttributeSet
+import android.os.Handler
+import android.os.Looper
 import android.widget.LinearLayout
 import com.github.kr328.clash.design.databinding.ComponentTvNavigationBarBinding
 import com.github.kr328.clash.design.util.layoutInflater
@@ -37,6 +39,10 @@ class TvNavigationBar @JvmOverloads constructor(
 
     var onTabSelected: ((Tab) -> Unit)? = null
 
+    private var activeTab: Tab? = null
+    private val handler = Handler(Looper.getMainLooper())
+    private var pendingSelection: Runnable? = null
+
     var proxyEnabled: Boolean
         get() = binding.tvNavProxy.isEnabled
         set(value) {
@@ -48,11 +54,30 @@ class TvNavigationBar @JvmOverloads constructor(
         orientation = HORIZONTAL
         clipChildren = false
         items.forEach { (tab, view) ->
-            view.setOnClickListener { onTabSelected?.invoke(tab) }
+            view.setOnClickListener {
+                cancelPendingSelection()
+                if (tab != activeTab) onTabSelected?.invoke(tab)
+            }
+            view.setOnFocusChangeListener { _, hasFocus ->
+                if (hasFocus && tab != activeTab) {
+                    cancelPendingSelection()
+                    val selection = Runnable {
+                        if (view.hasFocus() && tab != activeTab) {
+                            pendingFocusTab = tab
+                            onTabSelected?.invoke(tab)
+                        }
+                    }
+                    pendingSelection = selection
+                    handler.postDelayed(selection, MENU_SELECTION_DELAY_MS)
+                } else if (!hasFocus) {
+                    cancelPendingSelection()
+                }
+            }
         }
     }
 
     fun setActiveTab(tab: Tab) {
+        activeTab = tab
         items.forEach { (itemTab, view) -> view.isSelected = itemTab == tab }
     }
 
@@ -62,5 +87,21 @@ class TvNavigationBar @JvmOverloads constructor(
 
     fun focus(tab: Tab) {
         items[tab]?.requestFocus()
+    }
+
+    private fun cancelPendingSelection() {
+        pendingSelection?.let(handler::removeCallbacks)
+        pendingSelection = null
+    }
+
+    companion object {
+        private const val MENU_SELECTION_DELAY_MS = 220L
+        private var pendingFocusTab: Tab? = null
+
+        fun consumePendingFocus(tab: Tab): Boolean {
+            if (pendingFocusTab != tab) return false
+            pendingFocusTab = null
+            return true
+        }
     }
 }

@@ -6,7 +6,7 @@
 
 - 应用名：Clash Verge TV
 - 包名：`io.github.clashvergerev.tv`
-- 版本：`0.1.8`（versionCode 108）
+- 版本：`0.1.11`（versionCode 111）
 - minSdk：21
 - targetSdk / compileSdk：35
 - Sony BRAVIA 8M2 国行实机：`armeabi-v7a`

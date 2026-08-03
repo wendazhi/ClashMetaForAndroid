@@ -1,9 +1,12 @@
 package com.github.kr328.clash.design
 
 import android.content.Context
+import android.content.res.Configuration
 import android.content.res.ColorStateList
 import android.view.View
 import android.widget.Toast
+import android.widget.TextView
+import android.view.ViewGroup
 import androidx.viewpager2.widget.ViewPager2
 import com.github.kr328.clash.core.model.Proxy
 import com.github.kr328.clash.core.model.TunnelState
@@ -41,7 +44,10 @@ class ProxyDesign(
     private val binding = DesignProxyBinding
         .inflate(context.layoutInflater, context.root, false)
 
-    private var config = ProxyViewConfig(context, uiStore.proxyLine)
+    private val television = context.resources.configuration.uiMode and Configuration.UI_MODE_TYPE_MASK ==
+        Configuration.UI_MODE_TYPE_TELEVISION
+
+    private var config = ProxyViewConfig(context, if (television) 3 else uiStore.proxyLine)
 
     private val menu: ProxyMenu by lazy {
         ProxyMenu(context, binding.menuView, overrideMode, uiStore, requests) {
@@ -53,6 +59,7 @@ class ProxyDesign(
         get() = binding.pagesView.adapter!! as ProxyPageAdapter
 
     private var horizontalScrolling = false
+    private var restoreUrlTestFocus = false
     private val verticalBottomScrolled: Boolean
         get() = adapter.states[binding.pagesView.currentItem].bottom
     private var urlTesting: Boolean
@@ -94,6 +101,13 @@ class ProxyDesign(
 
         binding.activityBarLayout.applyFrom(context)
 
+        if (television) {
+            binding.root.post {
+                val horizontalMargin = (12 * context.resources.displayMetrics.density).toInt()
+                binding.root.setPaddingRelative(horizontalMargin, 0, horizontalMargin, 0)
+            }
+        }
+
         binding.menuView.setOnClickListener {
             menu.show()
         }
@@ -107,9 +121,13 @@ class ProxyDesign(
             binding.pagesView.visibility = View.GONE
             binding.urlTestFloatView.visibility = View.GONE
         } else {
-            binding.urlTestFloatView.supportImageTintList = ColorStateList.valueOf(
-                context.resolveThemedColor(com.google.android.material.R.attr.colorOnPrimary)
-            )
+            if (television) {
+                binding.urlTestFloatView.visibility = View.GONE
+            } else {
+                binding.urlTestFloatView.supportImageTintList = ColorStateList.valueOf(
+                    context.resolveThemedColor(com.google.android.material.R.attr.colorOnPrimary)
+                )
+            }
 
             binding.pagesView.apply {
                 adapter = ProxyPageAdapter(
@@ -142,6 +160,38 @@ class ProxyDesign(
                 tab.text = groupNames[index]
             }.attach()
 
+            if (television) {
+                binding.tabLayoutView.setPaddingRelative(
+                    0,
+                    0,
+                    (220 * context.resources.displayMetrics.density).toInt(),
+                    0,
+                )
+                binding.tabLayoutView.tabMode = com.google.android.material.tabs.TabLayout.MODE_SCROLLABLE
+                binding.tabLayoutView.tabGravity = com.google.android.material.tabs.TabLayout.GRAVITY_START
+                binding.tabLayoutView.setSelectedTabIndicatorColor(android.graphics.Color.TRANSPARENT)
+                binding.tabLayoutView.post {
+                    val strip = binding.tabLayoutView.getChildAt(0) as? ViewGroup ?: return@post
+                    for (index in 0 until strip.childCount) {
+                        val tabView = strip.getChildAt(index) as? ViewGroup ?: continue
+                        val spacing = (6 * context.resources.displayMetrics.density).toInt()
+                        (tabView.layoutParams as? ViewGroup.MarginLayoutParams)?.apply {
+                            marginStart = spacing
+                            marginEnd = spacing
+                            tabView.layoutParams = this
+                        }
+                        tabView.setPadding(spacing * 2, 0, spacing * 2, 0)
+                        tabView.minimumWidth = 0
+                        tabView.background = context.getDrawable(R.drawable.tv_proxy_tab_background)
+                        val label = tabView.findTextView()
+                        label?.apply {
+                            maxLines = 1
+                            isSingleLine = true
+                        }
+                    }
+                }
+            }
+
             val initialPosition = groupNames.indexOf(uiStore.proxyLastGroup)
 
             binding.pagesView.post {
@@ -151,7 +201,19 @@ class ProxyDesign(
         }
     }
 
+    private fun View.findTextView(): TextView? {
+        if (this is TextView) return this
+        if (this !is ViewGroup) return null
+        for (index in 0 until childCount) {
+            getChildAt(index).findTextView()?.let { return it }
+        }
+        return null
+    }
+
     fun requestUrlTesting() {
+        if (urlTesting) return
+
+        restoreUrlTestFocus = television && binding.urlTestView.hasFocus()
         urlTesting = true
 
         requests.trySend(Request.UrlTest(binding.pagesView.currentItem))
@@ -160,13 +222,20 @@ class ProxyDesign(
     }
 
     private fun updateUrlTestButtonStatus() {
-        if (verticalBottomScrolled || horizontalScrolling || urlTesting) {
+        if (television || verticalBottomScrolled || horizontalScrolling || urlTesting) {
             binding.urlTestFloatView.hide()
         } else {
             binding.urlTestFloatView.show()
         }
 
-        if (urlTesting) {
+        if (television) {
+            binding.urlTestView.visibility = View.VISIBLE
+            binding.urlTestProgressView.visibility = if (urlTesting) View.VISIBLE else View.GONE
+            if (!urlTesting && restoreUrlTestFocus) {
+                restoreUrlTestFocus = false
+                binding.urlTestView.post { binding.urlTestView.requestFocus() }
+            }
+        } else if (urlTesting) {
             binding.urlTestView.visibility = View.GONE
             binding.urlTestProgressView.visibility = View.VISIBLE
         } else {
